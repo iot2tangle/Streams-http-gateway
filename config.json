@@ -1,0 +1,7 @@
+{
+    "device_name": "XDK_HTTP",
+    "port": 8080,
+    "node": "https://nodes.iota.cafe:443",
+    "mwm": 14,
+    "local_pow": false
+}
