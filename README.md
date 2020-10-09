@@ -1,4 +1,4 @@
-# streams-gateway
+# I2T Streams Gateway
 
 ## Preparation
 Install rust if you don't have it already, find the instructions here https://www.rust-lang.org/tools/install
@@ -10,11 +10,13 @@ Make sure you also have the build dependencies installed, if not run:
 `sudo apt update`  
 
 ## Installing the streams-gateway
+
 Download the Repository:  
-`git clone https://github.com/iot2tangle/streams-gateway`  
-`cd streams-gateway`  
+
+`git clone https://github.com/iot2tangle/Streams-wifi-gateway.git`
   
 Configure the streams-gateway:  
+
 `nano config.json`  
  
 Set the *device_name* to the value specified in the configuration file of the XDK110.  
@@ -24,10 +26,13 @@ Change *port, node, mwm, local_pow* if needed
 ## Runnig the Examples:  
   
 Run the streams-gateway:  
+
 `cargo run --release`  
+
 This starts the server which will forward messages from the devices to the Tangle  
   
 The Output will be something like this:  
+
 `>> Starting.... `  
 `>> Channel root: "ab3de895ec41c88bd917e8a47d54f76d52794d61ff4c4eb3569c31f619ee623d0000000000000000"`  
 `>> To Start the Subscriber run: `  
@@ -37,6 +42,7 @@ The Output will be something like this:
 `>> Listening on http://0.0.0.0:8080`  
 
 In a separate window start a subscriber using the Channle Root printed by the Gateway (see example above):  
+
 `cargo run --release --example subscriber <your_channel_root> `  
 
 To send data to the server you can use Postman, or like in this case cURL, make sure the port is the same as in the config.json file:  
