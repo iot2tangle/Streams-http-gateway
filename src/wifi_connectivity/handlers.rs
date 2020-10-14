@@ -1,11 +1,9 @@
-use crate::authenticate;
-use crate::security::keystore::{calculate_hash, KeyManager};
+use crate::device_auth::keystore::{authenticate, calculate_hash, KeyManager};
 use crate::timestamp_in_sec;
 use crate::types::sensor_data::SensorData;
 use std::sync::{Arc, Mutex};
 
-use crate::iota_channels_lite::channel_author::Channel;
-use crate::iota_channels_lite::utils::payload::json::PayloadBuilder;
+use gateway_core::gateway::publisher::Channel;
 
 type GenericError = Box<dyn std::error::Error + Send + Sync>;
 type Result<T> = std::result::Result<T, GenericError>;
@@ -36,13 +34,13 @@ pub async fn sensor_data_response(
     let json_data: serde_json::Result<SensorData> = serde_json::from_slice(&data);
     match json_data {
         Ok(mut sensor_data) => {
-            let hash = keystore
+            let hashes = keystore
                 .lock()
                 .expect("lock keystore")
                 .keystore
-                .api_key_author
+                .api_keys_author
                 .clone();
-            if authenticate(&sensor_data.device, hash.clone()) {
+            if authenticate(&sensor_data.device, hashes.clone()) {
                 sensor_data.device.to_string().push_str("_id");
                 sensor_data.device = calculate_hash(sensor_data.device);
                 sensor_data.timestamp = serde_json::Value::from(timestamp_in_sec());
@@ -51,9 +49,7 @@ pub async fn sensor_data_response(
                     timestamp_in_sec()
                 );
                 let mut channel = channel.lock().unwrap();
-                match channel
-                    .write_signed(PayloadBuilder::new().public(&sensor_data).unwrap().build())
-                {
+                match channel.write_signed(&sensor_data) {
                     Ok(_) => {
                         response = Response::builder()
                             .status(StatusCode::OK)

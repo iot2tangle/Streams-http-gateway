@@ -1,6 +1,6 @@
-use crate::api::handlers::{sensor_data_response, status_response};
-use crate::iota_channels_lite::channel_author::Channel;
-use crate::security::keystore::KeyManager;
+use crate::device_auth::keystore::KeyManager;
+use crate::wifi_connectivity::handlers::{sensor_data_response, status_response};
+use gateway_core::gateway::publisher::Channel;
 
 use hyper::service::{make_service_fn, service_fn};
 
