@@ -13,7 +13,7 @@ Make sure you also have the build dependencies installed, if not run:
 
 Download the Repository:  
 
-`git clone https://github.com/iot2tangle/Streams-wifi-gateway.git`
+`git clone https://github.com/iot2tangle/Streams-http-gateway.git`
   
 Configure the streams-gateway:  
 
