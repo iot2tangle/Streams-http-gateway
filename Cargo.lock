@@ -668,7 +668,7 @@ dependencies = [
 [[package]]
 name = "gateway_core"
 version = "0.1.0"
-source = "git+https://github.com/iot2tangle/streams-gateway-core?branch=develop#a27196bd99ed23cc8627b23cf4f3cf0ff285e274"
+source = "git+https://github.com/iot2tangle/streams-gateway-core#3c5a18f4f8a0dbbb08d5adf419b723414f08f9f1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2051,7 +2051,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "streams-gateway"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "base64",
