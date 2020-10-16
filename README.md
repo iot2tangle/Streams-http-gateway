@@ -1,5 +1,6 @@
 # Streams-WiFi-Gateway
 
+
 ## Preparation
 Install rust if you don't have it already, find the instructions here https://www.rust-lang.org/tools/install
 
@@ -13,7 +14,8 @@ Make sure you also have the build dependencies installed, if not run:
 
 Download the Repository:  
 
-`git clone https://github.com/iot2tangle/Streams-wifi-gateway.git`
+`git clone https://github.com/iot2tangle/Streams-http-gateway.git`
+
   
 Configure the streams-gateway:  
 
@@ -26,17 +28,21 @@ Change *port, node, mwm, local_pow* if needed
   
 ## Runnig the Examples:  
   
-Run the Streams Gateway:  
+Run the streams-gateway:  
+
 `cargo run --release`  
-This starts the server which will forward messages from the XDK to the Tangle  
+
+This starts the server which will forward messages from the devices to the Tangle  
   
 The Output will be something like this:  
-`>> Starting.... `  
-`>> Channel root: "ab3de895ec41c88bd917e8a47d54f76d52794d61ff4c4eb3569c31f619ee623d0000000000000000"`  
 
-`>> To read the messages copy the channel root into http://iot2tangle.link/ `
+`>> Starting.... `  
+`>> Channel root: "1ae17817b19988943cb80b805f23d3ffb4e4dfec89c581285a03479a2600427a0000000000000000:6969b97e7a844ecdf7aa126d"`  
+
+`>> To read the messages copy the channel root into https://explorer.iot2tangle.io/ `
   
 `>> Listening on http://0.0.0.0:8080`    
+
 
 To send data to the server you can use Postman, or like in this case cURL, make sure the port is the same as in the config.json file:  
 `  
