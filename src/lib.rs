@@ -9,16 +9,10 @@
     unstable_features
 )]
 #![cfg_attr(not(debug_assertions), deny(warnings))]
-
-pub mod api;
-pub mod iota_channels_lite;
-pub mod security;
+extern crate gateway_core;
+pub mod device_auth;
 pub mod types;
-
-use crate::security::keystore::calculate_hash;
-fn authenticate(key: &str, hash: String) -> bool {
-    calculate_hash(key.to_string()) == hash
-}
+pub mod wifi_connectivity;
 
 use std::time::{SystemTime, UNIX_EPOCH};
 fn timestamp_in_sec() -> u64 {

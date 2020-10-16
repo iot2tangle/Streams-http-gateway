@@ -1,7 +1,7 @@
-use local::api::stream_server;
-use local::iota_channels_lite::channel_author::Channel;
-use local::security::keystore::KeyManager;
+use gateway_core::gateway::publisher::Channel;
+use local::device_auth::keystore::KeyManager;
 use local::types::config::Config;
+use local::wifi_connectivity::http_server;
 
 use std::fs::File;
 use std::sync::{Arc, Mutex};
@@ -12,30 +12,26 @@ use iota_streams::app::transport::tangle::client::SendTrytesOptions;
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     //read configuration file
     let config: Config = serde_json::from_reader(File::open("config.json").unwrap()).unwrap();
-    let device_name = config.device_name;
-    let port = config.port;
-    let node = config.node;
-    let mwm = config.mwm;
-    let local_pow = config.local_pow;
 
-    let store = KeyManager::new(device_name.to_string());
+    let store = KeyManager::new(config.whitelisted_device_ids);
 
     println!("Starting....");
 
     let mut send_opt = SendTrytesOptions::default();
-    send_opt.min_weight_magnitude = mwm;
-    send_opt.local_pow = local_pow;
+    send_opt.min_weight_magnitude = config.mwm;
+    send_opt.local_pow = config.local_pow;
 
-    let channel = Arc::new(Mutex::new(Channel::new(node, send_opt, None)));
-    let (addr, _) = channel.lock().expect("").open().unwrap();
-    println!("Channel root: {:?}", addr);
+    let channel = Arc::new(Mutex::new(Channel::new(config.node, send_opt, None)));
+    let (addr, msg_id) = match channel.lock().expect("").open() {
+        Ok(a) => a,
+        Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),
+    };
+    println!("Channel root: {:?}", format!("{}:{}", addr, msg_id));
     println!(
-        "To Start the Subscriber run: \n
-    cargo run --release --example subscriber {:?} \n",
-        addr
+        "\n To read the messages copy the channel root into https://explorer.iot2tangle.io/ \n "
     );
 
     let store = Arc::new(Mutex::new(store));
 
-    stream_server::start(port, channel, store).await
+    http_server::start(config.port, channel, store).await
 }

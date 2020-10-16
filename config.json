@@ -1,5 +1,8 @@
 {
-    "device_name": "DEVICE_ID",
+    "whitelisted_device_ids": [
+        "DEVICE_ID_1",
+        "DEVICE_ID_2"
+    ],
     "port": 8080,
     "node": "https://nodes.iota.cafe:443",
     "mwm": 14,

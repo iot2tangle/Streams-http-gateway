@@ -3,7 +3,7 @@ use serde_derive::Serialize;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    pub device_name: String,
+    pub whitelisted_device_ids: Vec<String>,
     pub port: u16,
     pub node: String,
     pub mwm: u8,

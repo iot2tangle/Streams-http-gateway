@@ -1,6 +1,6 @@
 [package]
 name = "streams-gateway"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["AleBuser <4l3bu53r@gmail.com>"]
 edition = "2018"
 
@@ -12,6 +12,7 @@ path = "src/lib.rs"
 failure = "0.1.7"
 anyhow = { version = "1.0", default-features = false }
 iota-streams = { git = "https://github.com/iotaledger/streams"}
+gateway_core = { git = "https://github.com/iot2tangle/streams-gateway-core", branch="master"}
 iota-core = { git = "https://github.com/iotaledger/iota.rs", rev = "03cf531" }
 iota-conversion = { git = "https://github.com/iotaledger/iota.rs", rev = "03cf531" }
 serde = {version="1.0.110", features = ["derive"] }
