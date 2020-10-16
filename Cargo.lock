@@ -114,6 +114,62 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3441f0f7b02788e948e47f457ca01f1d7e6d92c693bc132c22b087d3141c03ff"
 
 [[package]]
+name = "bee-common-derive"
+version = "0.1.1-alpha"
+source = "git+https://github.com/iotaledger/bee.git?branch=dev#3ece4c59e98d0354cc8fce183325577a11318f13"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "bee-crypto"
+version = "0.2.0-alpha"
+source = "git+https://github.com/iotaledger/bee.git?branch=dev#3ece4c59e98d0354cc8fce183325577a11318f13"
+dependencies = [
+ "bee-ternary",
+ "byteorder",
+ "lazy_static",
+ "thiserror",
+ "tiny-keccak",
+]
+
+[[package]]
+name = "bee-signing"
+version = "0.1.1-alpha"
+source = "git+https://github.com/iotaledger/bee.git?branch=dev#3ece4c59e98d0354cc8fce183325577a11318f13"
+dependencies = [
+ "bee-common-derive",
+ "bee-crypto",
+ "bee-ternary",
+ "rand 0.7.3",
+ "sha3",
+ "thiserror",
+ "zeroize",
+]
+
+[[package]]
+name = "bee-ternary"
+version = "0.3.1-alpha"
+source = "git+https://github.com/iotaledger/bee.git?branch=dev#3ece4c59e98d0354cc8fce183325577a11318f13"
+dependencies = [
+ "num-traits",
+ "serde",
+]
+
+[[package]]
+name = "bee-transaction"
+version = "0.1.0-alpha"
+source = "git+https://github.com/Alex6323/bee-p.git#f2a5075dd02ef3c5f0fbc349fe38652f7da16fa4"
+dependencies = [
+ "bee-crypto",
+ "bee-signing",
+ "bee-ternary",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -125,7 +181,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0940dc441f31689269e10ac70eb1002a3a1d3ad1390e030043662eb7fe4688b"
 dependencies = [
- "block-padding",
+ "block-padding 0.1.5",
  "byte-tools",
  "byteorder",
  "generic-array 0.12.3",
@@ -137,6 +193,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4152116fd6e9dadb291ae18fc1ec3575ed6d84c29642d97890f4b4a3417297e4"
 dependencies = [
+ "block-padding 0.2.1",
  "generic-array 0.14.4",
 ]
 
@@ -148,6 +205,12 @@ checksum = "fa79dedbb091f449f1f39e53edf88d5dbe95f895dae6135a8d7b881fb5af73f5"
 dependencies = [
  "byte-tools",
 ]
+
+[[package]]
+name = "block-padding"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
 name = "blocking"
@@ -558,6 +621,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "futures-macro"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f57ed14da4603b2554682e9f2ff3c65d7567b53188db96cb71538217fc64581b"
+dependencies = [
+ "proc-macro-hack",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "futures-sink"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -580,17 +655,20 @@ checksum = "8a894a0acddba51a2d49a6f4263b1e64b8c579ece8af50fa86503d52cd1eea34"
 dependencies = [
  "futures-core",
  "futures-io",
+ "futures-macro",
  "futures-task",
  "memchr",
  "pin-project",
  "pin-utils",
+ "proc-macro-hack",
+ "proc-macro-nested",
  "slab",
 ]
 
 [[package]]
 name = "gateway_core"
 version = "0.1.0"
-source = "git+https://github.com/iot2tangle/streams-gateway-core#c2ffabfd419684c0bdff41c767a67d7cb69aac77"
+source = "git+https://github.com/iot2tangle/streams-gateway-core?branch=develop#86424fcc51a418de5085fe650a9c8b8a944d4358"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -598,7 +676,7 @@ dependencies = [
  "chrono",
  "failure",
  "iota-conversion",
- "iota-core",
+ "iota-core 0.2.0-alpha.3 (git+https://github.com/iotaledger/iota.rs?rev=0ad8e7f)",
  "iota-streams",
  "rand 0.7.3",
  "serde",
@@ -775,6 +853,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-rustls"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37743cc83e8ee85eacfce90f2f4102030d9ff0a95244098d781e9bee4a90abb6"
+dependencies = [
+ "bytes",
+ "futures-util",
+ "hyper",
+ "log",
+ "rustls",
+ "tokio",
+ "tokio-rustls",
+ "webpki",
+]
+
+[[package]]
 name = "hyper-tls"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -848,6 +942,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "iota-client"
+version = "0.5.0-alpha.3"
+source = "git+https://github.com/iotaledger/iota.rs?rev=0ad8e7f#0ad8e7f7d45cd018f7b15958e8b0478568f92213"
+dependencies = [
+ "bee-crypto",
+ "bee-signing",
+ "bee-ternary",
+ "bee-transaction",
+ "chrono",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "smol",
+]
+
+[[package]]
 name = "iota-common-preview"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -885,11 +995,23 @@ version = "0.2.0-alpha.3"
 source = "git+https://github.com/iotaledger/iota.rs?rev=03cf531#03cf531e0cdc09c474b5f4cf9474b958ef5f5789"
 dependencies = [
  "iota-bundle-preview",
- "iota-client",
+ "iota-client 0.5.0-alpha.3 (git+https://github.com/iotaledger/iota.rs?rev=03cf531)",
  "iota-conversion",
  "iota-crypto-preview",
  "iota-signing-preview",
  "iota-ternary-preview",
+]
+
+[[package]]
+name = "iota-core"
+version = "0.2.0-alpha.3"
+source = "git+https://github.com/iotaledger/iota.rs?rev=0ad8e7f#0ad8e7f7d45cd018f7b15958e8b0478568f92213"
+dependencies = [
+ "bee-crypto",
+ "bee-signing",
+ "bee-ternary",
+ "bee-transaction",
+ "iota-client 0.5.0-alpha.3 (git+https://github.com/iotaledger/iota.rs?rev=0ad8e7f)",
 ]
 
 [[package]]
@@ -931,8 +1053,8 @@ dependencies = [
 
 [[package]]
 name = "iota-streams"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "1.0.0"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "iota-streams-app",
  "iota-streams-app-channels",
@@ -944,15 +1066,16 @@ dependencies = [
 
 [[package]]
 name = "iota-streams-app"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "1.0.0"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "anyhow",
- "async-trait",
+ "bee-crypto",
+ "bee-transaction",
  "chrono",
  "hex",
  "iota-constants 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "iota-core",
+ "iota-core 0.2.0-alpha.3 (git+https://github.com/iotaledger/iota.rs?rev=0ad8e7f)",
  "iota-streams-core",
  "iota-streams-core-edsig",
  "iota-streams-ddml",
@@ -962,8 +1085,8 @@ dependencies = [
 
 [[package]]
 name = "iota-streams-app-channels"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "1.0.0"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "anyhow",
  "hex",
@@ -976,18 +1099,19 @@ dependencies = [
 
 [[package]]
 name = "iota-streams-core"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "0.3.0"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "digest 0.9.0",
  "hashbrown 0.8.2",
+ "hex",
  "rand 0.7.3",
 ]
 
 [[package]]
 name = "iota-streams-core-edsig"
 version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "curve25519-dalek",
  "ed25519-dalek",
@@ -998,8 +1122,8 @@ dependencies = [
 
 [[package]]
 name = "iota-streams-core-keccak"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "0.3.0"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "iota-streams-core",
  "keccak",
@@ -1007,8 +1131,8 @@ dependencies = [
 
 [[package]]
 name = "iota-streams-ddml"
-version = "0.2.0"
-source = "git+https://github.com/iotaledger/streams#54cc79648fdd0c03f921795a2c9b29bc96c6d081"
+version = "0.2.2"
+source = "git+https://github.com/iotaledger/streams#762142e8717d1054069ae2e1ad1dc056e12cdac0"
 dependencies = [
  "anyhow",
  "hashbrown 0.8.2",
@@ -1330,6 +1454,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
+name = "openssl-src"
+version = "111.12.0+1.1.1h"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "858a4132194f8570a7ee9eb8629e85b23cbc4565f2d4a162e87556e5956abf61"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "openssl-sys"
 version = "0.9.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1338,6 +1471,7 @@ dependencies = [
  "autocfg",
  "cc",
  "libc",
+ "openssl-src",
  "pkg-config",
  "vcpkg",
 ]
@@ -1449,6 +1583,18 @@ dependencies = [
  "env_logger",
  "log",
 ]
+
+[[package]]
+name = "proc-macro-hack"
+version = "0.5.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99c605b9a0adc77b7211c6b1f722dcb613d68d66859a44f3d485a6da332b0598"
+
+[[package]]
+name = "proc-macro-nested"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eba180dafb9038b050a4c280019bbedf9f2467b61e5d892dcad585bb57aadc5a"
 
 [[package]]
 name = "proc-macro2"
@@ -1609,6 +1755,7 @@ dependencies = [
  "http",
  "http-body",
  "hyper",
+ "hyper-rustls",
  "hyper-tls",
  "ipnet",
  "js-sys",
@@ -1619,16 +1766,34 @@ dependencies = [
  "native-tls",
  "percent-encoding",
  "pin-project-lite",
+ "rustls",
  "serde",
  "serde_json",
  "serde_urlencoded",
  "tokio",
+ "tokio-rustls",
  "tokio-tls",
  "url",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
+ "webpki-roots",
  "winreg",
+]
+
+[[package]]
+name = "ring"
+version = "0.16.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "952cd6b98c85bbc30efa1ba5783b8abf12fec8b3287ffa52605b9432313e34e4"
+dependencies = [
+ "cc",
+ "libc",
+ "once_cell",
+ "spin",
+ "untrusted",
+ "web-sys",
+ "winapi 0.3.9",
 ]
 
 [[package]]
@@ -1663,6 +1828,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
+name = "rustls"
+version = "0.18.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d1126dcf58e93cee7d098dbda643b5f92ed724f1f6a63007c1116eed6700c81"
+dependencies = [
+ "base64",
+ "log",
+ "ring",
+ "sct",
+ "webpki",
+]
+
+[[package]]
 name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1691,6 +1869,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
+name = "sct"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e3042af939fca8c3453b7af0f1c66e533a15a86169e39de2657310ade8f98d3c"
+dependencies = [
+ "ring",
+ "untrusted",
+]
+
+[[package]]
 name = "security-framework"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1715,18 +1903,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.116"
+version = "1.0.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96fe57af81d28386a513cbc6858332abc6117cfdb5999647c6444b8f43a370a5"
+checksum = "b88fa983de7720629c9387e9f517353ed404164b1e482c970a90c1a4aaf7dc1a"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.116"
+version = "1.0.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f630a6370fd8e457873b4bd2ffdae75408bc291ba72be773772a4c2a065d9ae8"
+checksum = "cbd1ae72adb44aab48f325a02444a5fc079349a8d804c1fc922aed3f7454c74e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1778,6 +1966,18 @@ dependencies = [
  "cfg-if 0.1.10",
  "cpuid-bool",
  "digest 0.9.0",
+ "opaque-debug 0.3.0",
+]
+
+[[package]]
+name = "sha3"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f81199417d4e5de3f04b1e871023acea7389672c4135918f05aa9cbf2f2fa809"
+dependencies = [
+ "block-buffer 0.9.0",
+ "digest 0.9.0",
+ "keccak",
  "opaque-debug 0.3.0",
 ]
 
@@ -1844,6 +2044,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "spin"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
+
+[[package]]
 name = "streams-gateway"
 version = "0.1.0"
 dependencies = [
@@ -1853,7 +2059,7 @@ dependencies = [
  "gateway_core",
  "hyper",
  "iota-conversion",
- "iota-core",
+ "iota-core 0.2.0-alpha.3 (git+https://github.com/iotaledger/iota.rs?rev=03cf531)",
  "iota-streams",
  "rand 0.7.3",
  "rust-crypto",
@@ -1919,6 +2125,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb6bfa289a4d7c5766392812c0a1f4c1ba45afa1ad47803c11e1f407d846d75f"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "thiserror"
+version = "1.0.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "318234ffa22e0920fe9a40d7b8369b5f649d490980cf7aadcf1eb91594869b42"
+dependencies = [
+ "thiserror-impl",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "1.0.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cae2447b6282786c3493999f40a9be2a6ad20cb8bd268b0a0dbf5a065535c0ab"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -2005,6 +2231,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tokio-rustls"
+version = "0.14.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e12831b255bcfa39dc0436b01e19fea231a37db570686c06ee72c423479f889a"
+dependencies = [
+ "futures-core",
+ "rustls",
+ "tokio",
+ "webpki",
 ]
 
 [[package]]
@@ -2102,6 +2340,12 @@ name = "unicode-xid"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
+
+[[package]]
+name = "untrusted"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "url"
@@ -2230,6 +2474,25 @@ checksum = "4bf6ef87ad7ae8008e15a355ce696bed26012b7caa21605188cfd8214ab51e2d"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "webpki"
+version = "0.21.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ab146130f5f790d45f82aeeb09e55a256573373ec64409fc19a6fb82fb1032ae"
+dependencies = [
+ "ring",
+ "untrusted",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8eff4b7516a57307f9349c64bf34caa34b940b66fed4b2fb3136cb7386e5739"
+dependencies = [
+ "webpki",
 ]
 
 [[package]]
