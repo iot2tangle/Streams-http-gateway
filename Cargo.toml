@@ -1,6 +1,6 @@
 [package]
 name = "streams-gateway"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["AleBuser <4l3bu53r@gmail.com>"]
 edition = "2018"
 
