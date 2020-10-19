@@ -6,8 +6,6 @@ use local::wifi_connectivity::http_server;
 use std::fs::File;
 use std::sync::{Arc, Mutex};
 
-use iota_streams::app::transport::tangle::client::SendTrytesOptions;
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     //read configuration file
@@ -17,11 +15,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     println!("Starting....");
 
-    let mut send_opt = SendTrytesOptions::default();
-    send_opt.min_weight_magnitude = config.mwm;
-    send_opt.local_pow = config.local_pow;
-
-    let channel = Arc::new(Mutex::new(Channel::new(config.node, send_opt, None)));
+    let channel = Arc::new(Mutex::new(Channel::new(
+        config.node,
+        config.mwm,
+        config.local_pow,
+        None,
+    )));
     let (addr, msg_id) = match channel.lock().expect("").open() {
         Ok(a) => a,
         Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),
