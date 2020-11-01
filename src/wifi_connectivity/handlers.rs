@@ -26,6 +26,7 @@ pub async fn sensor_data_response(
     req: Request<Body>,
     channel: Arc<Mutex<Channel>>,
     keystore: Arc<Mutex<KeyManager>>,
+    channel_id: String,
 ) -> Result<Response<Body>> {
     let data = hyper::body::to_bytes(req.into_body()).await?;
 
@@ -54,7 +55,7 @@ pub async fn sensor_data_response(
                         response = Response::builder()
                             .status(StatusCode::OK)
                             .header(header::CONTENT_TYPE, "application/json")
-                            .body(Body::from("Data Sucessfully Sent To Tangle"))?;
+                            .body(Body::from(channel_id))?;
                     }
                     Err(_e) => {
                         println!(

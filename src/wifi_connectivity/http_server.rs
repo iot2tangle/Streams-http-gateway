@@ -18,15 +18,17 @@ pub async fn start(
     port: u16,
     channel: Arc<Mutex<Channel>>,
     keystore: Arc<Mutex<KeyManager>>,
+    channel_id: String,
 ) -> Result<()> {
     let addr = ([0, 0, 0, 0], port).into();
 
     let service = make_service_fn(move |_| {
         let channel = channel.clone();
         let keystore = keystore.clone();
+        let channel_id = channel_id.clone();
         async {
             Ok::<_, GenericError>(service_fn(move |req| {
-                responder(req, channel.clone(), keystore.clone())
+                responder(req, channel.clone(), keystore.clone(), channel_id.clone())
             }))
         }
     });
@@ -44,9 +46,12 @@ async fn responder(
     req: Request<Body>,
     channel: Arc<Mutex<Channel>>,
     keystore: Arc<Mutex<KeyManager>>,
+    channel_id: String,
 ) -> Result<Response<Body>> {
     match (req.method(), req.uri().path()) {
-        (&Method::POST, "/sensor_data") => sensor_data_response(req, channel, keystore).await,
+        (&Method::POST, "/sensor_data") => {
+            sensor_data_response(req, channel, keystore, channel_id).await
+        }
         (&Method::GET, "/status") => status_response().await,
         _ => Ok(Response::builder()
             .status(StatusCode::NOT_FOUND)

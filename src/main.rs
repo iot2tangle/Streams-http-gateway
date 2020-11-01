@@ -25,12 +25,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         Ok(a) => a,
         Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),
     };
-    println!("Channel root: {:?}", format!("{}:{}", addr, msg_id));
+
+    let channel_id = format!("{}:{}", addr, msg_id);
+    println!("Channel root: {:?}", channel_id);
     println!(
         "\n To read the messages copy the channel root into https://explorer.iot2tangle.io/ \n "
     );
 
     let store = Arc::new(Mutex::new(store));
 
-    http_server::start(config.port, channel, store).await
+    http_server::start(config.port, channel, store, channel_id).await
 }
