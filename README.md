@@ -1,8 +1,10 @@
-# Streams-WiFi-Gateway
+# Streams-HTTP-Gateway
 
 
 ## Preparation
-Install rust if you don't have it already, find the instructions here https://www.rust-lang.org/tools/install
+Install Rust if you don't have it already, find the instructions here https://www.rust-lang.org/tools/install
+
+`curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 
 Make sure you also have the build dependencies installed, if not run:  
 `sudo apt install build-essential`  
