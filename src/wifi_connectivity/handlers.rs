@@ -122,16 +122,7 @@ pub async fn send_bundle_response(
                     sensor_data.device.to_string().push_str("_id");
                     sensor_data.device = calculate_hash(sensor_data.device.clone());
                     //sensor_data.timestamp = serde_json::Value::from(timestamp_in_sec());
-
-                    let mut channel_state = channel_state.lock().unwrap();
-                    match channel_state.channel.write_signed(&sensor_data) {
-                        Ok(_) => {
-                            status.push("OK");
-                        }
-                        Err(_e) => {
-                            status.push("CONNECTION");
-                        }
-                    };
+                    status.push("OK");
                 } else {
                     status.push("UNAUTHORIZED");
                     println!(
@@ -141,25 +132,29 @@ pub async fn send_bundle_response(
                 }
             }
 
-            let all_ok = { !status.contains(&"UNAUTHORIZED") && !status.contains(&"CONNECTION") };
-
-            if all_ok {
-                response = Response::builder()
-                    .status(StatusCode::OK)
-                    .header(header::CONTENT_TYPE, "application/json")
-                    .body(Body::from(channel_state.lock().unwrap().channel_id.clone()))?;
-            } else if status.contains(&"UNAUTHORIZED") {
+            if !status.contains(&"UNAUTHORIZED") {
+                let mut channel_state = channel_state.lock().unwrap();
+                match channel_state.channel.write_signed(&bundle_data) {
+                    Ok(_) => {
+                        response = Response::builder()
+                            .status(StatusCode::OK)
+                            .header(header::CONTENT_TYPE, "application/json")
+                            .body(Body::from(channel_state.channel_id.clone()))?;
+                    }
+                    Err(_e) => {
+                        response = Response::builder()
+                            .status(500)
+                            .header(header::CONTENT_TYPE, "application/json")
+                            .body(Body::from("Connection error while sending data to Tangle"))?;
+                    }
+                };
+            } else {
                 response = Response::builder()
                     .status(StatusCode::UNAUTHORIZED)
                     .header(header::CONTENT_TYPE, "application/json")
                     .body(Body::from(
                         "Unauthorized - At least 1 Device Name sent is not whitelisted",
                     ))?;
-            } else {
-                response = Response::builder()
-                    .status(500)
-                    .header(header::CONTENT_TYPE, "application/json")
-                    .body(Body::from("Error while sending data to Tangle"))?;
             }
         }
         Err(_e) => {
