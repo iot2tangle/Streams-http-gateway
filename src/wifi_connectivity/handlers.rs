@@ -1,6 +1,10 @@
 use crate::device_auth::keystore::{authenticate, calculate_hash, KeyManager};
 use crate::timestamp_in_sec;
-use crate::types::sensor_data::SensorData;
+use crate::types::{
+    bundle_data::BundleData, channel_state::ChannelState, config::Config, sensor_data::SensorData,
+    switch_auth::SwitchAuth,
+};
+
 use std::sync::{Arc, Mutex};
 
 use gateway_core::gateway::publisher::Channel;
@@ -24,7 +28,7 @@ pub async fn status_response() -> Result<Response<Body>> {
 ///
 pub async fn sensor_data_response(
     req: Request<Body>,
-    channel: Arc<Mutex<Channel>>,
+    channel_state: Arc<Mutex<ChannelState>>,
     keystore: Arc<Mutex<KeyManager>>,
 ) -> Result<Response<Body>> {
     let data = hyper::body::to_bytes(req.into_body()).await?;
@@ -48,13 +52,13 @@ pub async fn sensor_data_response(
                     "POST /sensor_data -- {:?} -- authorized request by device",
                     timestamp_in_sec()
                 );
-                let mut channel = channel.lock().unwrap();
-                match channel.write_signed(&sensor_data) {
+                let mut channel_state = channel_state.lock().unwrap();
+                match channel_state.channel.write_signed(&sensor_data) {
                     Ok(_) => {
                         response = Response::builder()
                             .status(StatusCode::OK)
                             .header(header::CONTENT_TYPE, "application/json")
-                            .body(Body::from("Data Sucessfully Sent To Tangle"))?;
+                            .body(Body::from(channel_state.channel_id.clone()))?;
                     }
                     Err(_e) => {
                         println!(
@@ -75,6 +79,143 @@ pub async fn sensor_data_response(
                     ))?;
                 println!(
                     "POST /sensor_data -- {:?} -- unauthorized request blocked",
+                    timestamp_in_sec()
+                );
+            }
+        }
+        Err(_e) => {
+            response = Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(Body::from("Malformed json - use iot2tangle json format"))?;
+        }
+    }
+    Ok(response)
+}
+
+pub async fn send_bundle_response(
+    req: Request<Body>,
+    channel_state: Arc<Mutex<ChannelState>>,
+    keystore: Arc<Mutex<KeyManager>>,
+) -> Result<Response<Body>> {
+    let data = hyper::body::to_bytes(req.into_body()).await?;
+
+    let response;
+
+    let json_data: serde_json::Result<BundleData> = serde_json::from_slice(&data);
+    match json_data {
+        Ok(mut bundle_data) => {
+            let hashes = keystore
+                .lock()
+                .expect("lock keystore")
+                .keystore
+                .api_keys_author
+                .clone();
+
+            println!(
+                "POST /bundle_data -- {:?} -- authorized request by device",
+                timestamp_in_sec()
+            );
+            let mut status: Vec<&str> = vec![];
+            for mut sensor_data in &mut bundle_data.bundle {
+                if authenticate(&sensor_data.device, hashes.clone()) {
+                    sensor_data.device.to_string().push_str("_id");
+                    sensor_data.device = calculate_hash(sensor_data.device.clone());
+                    //sensor_data.timestamp = serde_json::Value::from(timestamp_in_sec());
+                    status.push("OK");
+                } else {
+                    status.push("UNAUTHORIZED");
+                    println!(
+                        "POST /bundle_data -- {:?} -- unauthorized request blocked",
+                        timestamp_in_sec()
+                    );
+                }
+            }
+
+            if !status.contains(&"UNAUTHORIZED") {
+                let mut channel_state = channel_state.lock().unwrap();
+                match channel_state.channel.write_signed(&bundle_data) {
+                    Ok(_) => {
+                        response = Response::builder()
+                            .status(StatusCode::OK)
+                            .header(header::CONTENT_TYPE, "application/json")
+                            .body(Body::from(channel_state.channel_id.clone()))?;
+                    }
+                    Err(_e) => {
+                        response = Response::builder()
+                            .status(500)
+                            .header(header::CONTENT_TYPE, "application/json")
+                            .body(Body::from("Connection error while sending data to Tangle"))?;
+                    }
+                };
+            } else {
+                response = Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        "Unauthorized - At least 1 Device Name sent is not whitelisted",
+                    ))?;
+            }
+        }
+        Err(_e) => {
+            response = Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .header(header::CONTENT_TYPE, "application/json")
+                .body(Body::from("Malformed json - use iot2tangle json format"))?;
+        }
+    }
+    Ok(response)
+}
+
+pub async fn switch_channel_response(
+    req: Request<Body>,
+    channel_state: Arc<Mutex<ChannelState>>,
+    keystore: Arc<Mutex<KeyManager>>,
+    config: Config,
+) -> Result<Response<Body>> {
+    let data = hyper::body::to_bytes(req.into_body()).await?;
+
+    let response;
+
+    let json_data: serde_json::Result<SwitchAuth> = serde_json::from_slice(&data);
+    match json_data {
+        Ok(device_auth) => {
+            let hashes = keystore
+                .lock()
+                .expect("lock keystore")
+                .keystore
+                .api_keys_author
+                .clone();
+            if authenticate(&device_auth.device, hashes.clone()) {
+                println!(
+                    "POST /switch_channel -- {:?} -- authorized request by device",
+                    timestamp_in_sec()
+                );
+
+                let mut channel = Channel::new(config.node, config.mwm, config.local_pow, None);
+                let (addr, msg_id) = match channel.open() {
+                    Ok(a) => a,
+                    Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),
+                };
+                let channel_id = format!("{}:{}", addr, msg_id);
+
+                let mut channel_state = channel_state.lock().expect("");
+                channel_state.channel = channel;
+                channel_state.channel_id = channel_id.clone();
+
+                response = Response::builder()
+                    .status(StatusCode::OK)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(channel_id))?;
+            } else {
+                response = Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        "Unauthorized - Device Name sent by device doesn't match the configuration",
+                    ))?;
+                println!(
+                    "POST /switch_channel -- {:?} -- unauthorized request blocked",
                     timestamp_in_sec()
                 );
             }
