@@ -53,6 +53,9 @@ async fn responder(
         (&Method::POST, "/switch_channel") => {
             switch_channel_response(req, channel_state, keystore, config).await
         }
+        (&Method::GET, "/current_channel") => {
+            get_current_channel(req, channel_state, keystore).await
+        }
         (&Method::GET, "/status") => status_response().await,
         _ => Ok(Response::builder()
             .status(StatusCode::NOT_FOUND)

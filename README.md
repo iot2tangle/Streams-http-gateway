@@ -82,6 +82,13 @@ To switch channel you can do:
 `curl --location --request POST '127.0.0.1:8080/switch_channel'   
 --header 'Content-Type: application/json'   
 --data-raw '{"device": "DEVICE_ID_1"}'`
+
+To get the channel_id currently used channel:  
+`curl --location --request GET '127.0.0.1:8080/current_channel' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "device": "DEVICE_ID_1"
+}'`
          
          
 IMPORTANT: The device will be authenticated through the "device" field in the request (in this case XDK_HTTP), this has to match what was set as device_name in the config.json on the Gateway (see Configuration section above)!  
