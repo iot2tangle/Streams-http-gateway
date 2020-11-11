@@ -40,8 +40,6 @@ The Output will be something like this:
 
 `>> Starting.... `   
 
-`>> To read the messages copy the channel root into https://explorer.iot2tangle.io/ `
-  
 `>> Listening on http://0.0.0.0:8080`    
 
 
