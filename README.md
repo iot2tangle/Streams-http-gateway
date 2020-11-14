@@ -84,8 +84,8 @@ To switch channel you can do:
 --data-raw '{"device": "DEVICE_ID_1"}'`
 
 To get the channel_id currently used channel:  
-`curl --location --request GET '127.0.0.1:8080/current_channel' \
---header 'Content-Type: application/json' \
+`curl --location --request GET '127.0.0.1:8080/current_channel' 
+--header 'Content-Type: application/json' 
 --data-raw '{
     "device": "DEVICE_ID_1"
 }'`
