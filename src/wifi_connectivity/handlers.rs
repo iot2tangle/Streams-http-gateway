@@ -61,13 +61,13 @@ pub async fn sensor_data_response(
                             .body(Body::from(channel_state.channel_id.clone()))?;
                     }
                     Err(_e) => {
-                        println!(
-                            "POST /sensor_data Error: Malformed json, use iot2tangle json format"
-                        );
+                        println!("POST /sensor_data Error: Connection to IOTA Node Error");
                         response = Response::builder()
-                            .status(500)
+                            .status(StatusCode::REQUEST_TIMEOUT)
                             .header(header::CONTENT_TYPE, "application/json")
-                            .body(Body::from("Error while sending data to Tangle"))?;
+                            .body(Body::from(
+                                "Could not connect to IOTA Node, try with another node!",
+                            ))?;
                     }
                 };
             } else {
@@ -143,9 +143,11 @@ pub async fn send_bundle_response(
                     }
                     Err(_e) => {
                         response = Response::builder()
-                            .status(500)
+                            .status(StatusCode::REQUEST_TIMEOUT)
                             .header(header::CONTENT_TYPE, "application/json")
-                            .body(Body::from("Connection error while sending data to Tangle"))?;
+                            .body(Body::from(
+                                "Could not connect to IOTA Node, try with another node!",
+                            ))?;
                     }
                 };
             } else {
@@ -195,7 +197,14 @@ pub async fn switch_channel_response(
                 let mut channel = Channel::new(config.node, config.mwm, config.local_pow, None);
                 let (addr, msg_id) = match channel.open() {
                     Ok(a) => a,
-                    Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),
+                    Err(_) => {
+                        return Ok(Response::builder()
+                            .status(StatusCode::REQUEST_TIMEOUT)
+                            .header(header::CONTENT_TYPE, "application/json")
+                            .body(Body::from(
+                                "Could not connect to IOTA Node, try with another node!",
+                            ))?)
+                    }
                 };
                 let channel_id = format!("{}:{}", addr, msg_id);
 
