@@ -7,10 +7,9 @@ Install Rust if you don't have it already, find the instructions here https://ww
 `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 
 Make sure you also have the build dependencies installed, if not run:  
-`sudo apt install build-essential`  
-`sudo apt install pkg-config`  
-`sudo apt install libssl-dev`  
+
 `sudo apt update`  
+`sudo apt install build-essential pkg-config libssl-dev`  
 
 ## Installing the streams-gateway
 
