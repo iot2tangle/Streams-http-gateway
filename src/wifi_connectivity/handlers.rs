@@ -12,7 +12,7 @@ use gateway_core::gateway::publisher::Channel;
 type GenericError = Box<dyn std::error::Error + Send + Sync>;
 type Result<T> = std::result::Result<T, GenericError>;
 
-use hyper::{header, Body, Request, Response, StatusCode};
+use hyper::{header, Body, Request, Response, StatusCode, Uri};
 
 ///
 /// Handles the status request returning status code 200 if the server is online
@@ -188,6 +188,7 @@ pub async fn switch_channel_response(
                 .keystore
                 .api_keys_author
                 .clone();
+
             if authenticate(&device_auth.device, hashes.clone()) {
                 println!(
                     "POST /switch_channel -- {:?} -- authorized request by device",
@@ -244,19 +245,24 @@ pub async fn get_current_channel(
     channel_state: Arc<Mutex<ChannelState>>,
     keystore: Arc<Mutex<KeyManager>>,
 ) -> Result<Response<Body>> {
+    let req_uri = &req.uri().to_string().parse::<Uri>().unwrap();
+    let device_from_query = req_uri.query();
+
     let data = hyper::body::to_bytes(req.into_body()).await?;
 
     let response;
 
     let json_data: serde_json::Result<SwitchAuth> = serde_json::from_slice(&data);
+
+    let hashes = keystore
+        .lock()
+        .expect("lock keystore")
+        .keystore
+        .api_keys_author
+        .clone();
+
     match json_data {
         Ok(device_auth) => {
-            let hashes = keystore
-                .lock()
-                .expect("lock keystore")
-                .keystore
-                .api_keys_author
-                .clone();
             if authenticate(&device_auth.device, hashes.clone()) {
                 println!(
                     "GET /current_channel -- {:?} -- authorized request by device",
@@ -283,12 +289,48 @@ pub async fn get_current_channel(
                 );
             }
         }
-        Err(_e) => {
-            response = Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .header(header::CONTENT_TYPE, "application/json")
-                .body(Body::from("Malformed json - use iot2tangle json format"))?;
-        }
+        // if there is no json in the body => check Uri
+        Err(_) => match device_from_query {
+            Some(id) => {
+                if authenticate(&id, hashes.clone()) {
+                    println!(
+                        "GET /current_channel -- {:?} -- authorized request by device",
+                        timestamp_in_sec()
+                    );
+
+                    let channel_state = channel_state.lock().expect("");
+                    let channel_id = channel_state.channel_id.clone();
+
+                    response = Response::builder()
+                        .status(StatusCode::OK)
+                        .header(header::CONTENT_TYPE, "application/json")
+                        .body(Body::from(channel_id))?;
+                } else {
+                    response = Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        "Unauthorized - Device Name sent by device doesn't match the configuration",
+                    ))?;
+                    println!(
+                        "GET /current_channel -- {:?} -- unauthorized request blocked",
+                        timestamp_in_sec()
+                    );
+                }
+            }
+            None => {
+                response = Response::builder()
+                    .status(StatusCode::UNAUTHORIZED)
+                    .header(header::CONTENT_TYPE, "application/json")
+                    .body(Body::from(
+                        "Unauthorized - No device_id provided in Request Body or Uri",
+                    ))?;
+                println!(
+                    "GET /current_channel -- {:?} -- unauthorized request blocked",
+                    timestamp_in_sec()
+                );
+            }
+        },
     }
     Ok(response)
 }
