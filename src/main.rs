@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     println!("Starting....");
 
-    let mut channel = Channel::new(config.node.clone(), config.mwm, config.local_pow, None);
+    let mut channel = Channel::new(config.node.clone(), config.local_pow, None);
     let (addr, msg_id) = match channel.open() {
         Ok(a) => a,
         Err(_) => panic!("Could not connect to IOTA Node, try with another node!"),

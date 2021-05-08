@@ -195,7 +195,7 @@ pub async fn switch_channel_response(
                     timestamp_in_sec()
                 );
 
-                let mut channel = Channel::new(config.node, config.mwm, config.local_pow, None);
+                let mut channel = Channel::new(config.node, config.local_pow, None);
                 let (addr, msg_id) = match channel.open() {
                     Ok(a) => a,
                     Err(_) => {
